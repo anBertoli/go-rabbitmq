@@ -11,7 +11,7 @@ import (
 
 func client() {
 
-	// We start by establishing the connection, channel and declaring the queue.
+	// We start by establishing the connection, the channel and declaring the queue.
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672")
 	if err != nil {
 		log.Fatalf("%s", err)
