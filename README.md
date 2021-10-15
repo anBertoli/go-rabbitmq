@@ -13,3 +13,26 @@ consumer, and broker do not have to reside on the same host; indeed in most appl
 application can be both a producer and consumer, too.
 
 ![01 diagram](./assets/01.png)
+
+The producer connects to the Rabbit broker (the server), declares (creates) a queue and send some messages to it.
+The receiver similarly connects to the broker, declares the queue (is an idempotent operation) and starts 
+consuming the messages in the queue.
+
+```shell
+go run ./01_hello-world --mode producer
+
+# in another shell
+go run ./01_hello-world --mode consumer
+```
+
+#2 Worker Queues
+
+#3 Publish/Subscribe Pattern
+
+#4 Direct Routing
+
+#5 Topics Routing
+
+#6 Remote Procedure Calls
+
+#7 Publish Confirmations
