@@ -27,7 +27,7 @@ go run ./01_hello-world --mode producer
 go run ./01_hello-world --mode consumer
 ```
 
-#2 Worker Queues
+# 2. Worker Queues
 
 This example creates a work queue that will be used to distribute time-consuming tasks among multiple workers.
 The main idea behind work queues (aka: task queues) is to avoid doing a resource-intensive task immediately and 
@@ -65,7 +65,7 @@ go run ./02_workers-queue --mode producer
 go run ./02_workers-queue --mode worker
 ```
 
-#3 Publish/Subscribe 
+# 3. Publish/Subscribe 
 
 In previous parts of the tutorial we sent and received messages to and from a queue. In the full messaging model 
 in Rabbit there are also exchanges. The core idea in the messaging model in RabbitMQ is that the producer never 
@@ -101,10 +101,10 @@ go run ./03_publish-subscribe --mode publisher
 go run ./03_publish-subscribe --mode subscriber
 ```
 
-#4 Direct Routing
+# 4. Direct Routing
 
-#5 Topics Routing
+# 5. Topics Routing
 
-#6 Remote Procedure Calls
+# 6. Remote Procedure Calls
 
-#7 Publish Confirmations
+# 7. Publish Confirmations
