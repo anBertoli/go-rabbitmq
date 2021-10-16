@@ -56,16 +56,50 @@ it will dispatch it to the next consumer that is not still busy (if any).
 To start the example:
 ```shell
 # start the jobs producer
-go run ./02_worker-queue --mode producer
+go run ./02_workers-queue --mode producer
 
 # we can start as many worker as we want, more workers means more 
 # processing power and more jobs done in a period of time
 
 # in one or more other shells 
-go run ./02_worker-queue --mode worker
+go run ./02_workers-queue --mode worker
 ```
 
-#3 Publish/Subscribe Pattern
+#3 Publish/Subscribe 
+
+In previous parts of the tutorial we sent and received messages to and from a queue. In the full messaging model 
+in Rabbit there are also exchanges. The core idea in the messaging model in RabbitMQ is that the producer never 
+sends any messages directly to a queue. Actually, quite often the producer doesn't even know if a message will 
+be delivered to any queue at all. Instead, the producer can only send messages to an exchange. Then, Rabbit sent
+those messages to one or more queues bound to that exchange.
+
+An exchange is a very simple thing. On one side it receives messages from producers and the other side it pushes
+them to queues. The exchange must know exactly what to do with a message it receives. The rules for that are 
+defined by the exchange type (direct, topic, headers and fanout).
+
+This example is a logging system, we want to send all logs produced and sent to an exchange to all 'subscribers'. 
+To do this we will use an exchange of type 'fanout' which just broadcasts all the messages it receives to all 
+the queues it knows. When a consumer/subscriber joins we create a new empty queue with a random name, a queue that
+is specific for that subscriber. Then we bind the queue to the 'logs' exchange. Note that the subscriber is not 
+interested in messages sent before it is connected to the server. Secondly, when the subscriber disconnects, 
+the queue will be dropped.
+
+Basically, queues will be generated and destroyed dynamically when consumers connect and disconnect (and those
+queues will be filled with flowing messages only.
+
+![01 diagram](./assets/03.png)
+
+To start the example:
+```shell
+# start the jobs producer
+go run ./03_publish-subscribe --mode publisher
+
+# we can start as many subscribers as we want, 
+# similarly to a real subscription system
+
+# in one or more other shells 
+go run ./03_publish-subscribe --mode subscriber
+```
 
 #4 Direct Routing
 
