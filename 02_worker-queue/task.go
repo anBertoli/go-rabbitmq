@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type task struct {
@@ -16,17 +16,7 @@ func (t task) String() string {
 	return fmt.Sprintf("{ name: '%s', level: %d }", t.Name, t.Level)
 }
 
-func taskFromArgs(arg string) string {
-	var t task
-	if arg == "" {
-		t = task{"hello", 1}
-	} else {
-		level := bytes.Count([]byte(arg), []byte("."))
-		t = task{arg, level}
-	}
-	encoded, err := json.Marshal(t)
-	if err != nil {
-		log.Fatalf("%s", err)
-	}
-	return string(encoded)
+func parseTaskMessage(message amqp.Delivery) (t task, err error) {
+	err = json.Unmarshal(message.Body, &t)
+	return
 }

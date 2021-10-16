@@ -10,7 +10,7 @@ import (
 
 const queueName = "task_queue"
 
-func producer(taskS string) {
+func producer() {
 
 	// Establish the connection and create the communication channel.
 	// Then we must declare a queue to send messages.

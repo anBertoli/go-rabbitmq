@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"time"
 
@@ -92,9 +91,4 @@ func worker() {
 
 		log.Printf("Task completed: %s\n", message.Body)
 	}
-}
-
-func parseTaskMessage(message amqp.Delivery) (t task, err error) {
-	err = json.Unmarshal(message.Body, &t)
-	return
 }
