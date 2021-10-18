@@ -35,7 +35,7 @@ having to wait for it to complete. Instead we schedule the task to be done later
 message and send it to a queue. A worker process running in the background will pop the tasks and eventually 
 execute the job. When you run many workers the tasks will be shared between them.
 
-![01 diagram](./assets/02.png)
+![02 diagram](./assets/02.png)
 
 If a worker dies, we'd like the task to be delivered to another worker. In order to make sure a message is never
 lost, Rabbit supports message acknowledgments. An ack(nowledgement) is sent back by the consumer to tell Rabbit
@@ -74,10 +74,10 @@ be delivered to any queue at all. Instead, the producer can only send messages t
 those messages to one or more queues bound to that exchange.
 
 An exchange is a very simple thing. On one side it receives messages from producers and the other side it pushes
-them to queues. The exchange must know exactly what to do with a message it receives. The rules for that are 
-defined by the exchange type (direct, topic, headers and fanout).
+them to queues. The exchange must know exactly what to do with a message it receives. The rules for exchanges are 
+defined by their type (direct, topic, headers and fanout).
 
-This example is a logging system, we want to send all logs produced and sent to an exchange to all 'subscribers'. 
+This example is a logging system, we want to send all logs produced to an exchange and then to all 'subscribers'. 
 To do this we will use an exchange of type 'fanout' which just broadcasts all the messages it receives to all 
 the queues it knows. When a consumer/subscriber joins we create a new empty queue with a random name, a queue that
 is specific for that subscriber. Then we bind the queue to the 'logs' exchange. Note that the subscriber is not 
@@ -85,9 +85,9 @@ interested in messages sent before it is connected to the server. Secondly, when
 the queue will be dropped.
 
 Basically, queues will be generated and destroyed dynamically when consumers connect and disconnect (and those
-queues will be filled with flowing messages only.
+queues will be filled with flowing messages only).
 
-![01 diagram](./assets/03.png)
+![03 diagram](./assets/03.png)
 
 To start the example:
 ```shell
@@ -103,8 +103,48 @@ go run ./03_publish-subscribe --mode subscriber
 
 # 4. Direct Routing
 
+In this tutorial we're going to make it possible to subscribe only to a subset of the messages. The structure is
+similar to the previous program, but we use different routing/binding keys in both queue bindings and message sending. 
+To build this example we use a 'direct' exchange instead. The routing algorithm behind a direct exchange is simple - 
+a message goes to the queues whose binding key exactly matches the routing key of the message.
+
+![04 diagram](./assets/04.png)
+
+In the setup in figure, the direct exchange X has two queues bound to it. The first queue is bound with binding 
+key _orange_, and the second has two bindings, one with binding key _black_ and the other one with _green_. Here,
+a message published to the exchange with a routing key orange will be routed to the first queue. Messages with a 
+routing key of black or green will go to second queue. All other messages will be discarded. It is perfectly legal 
+to bind multiple queues with the same binding key. In this case a message with that routing key is sent to all 
+queues bound with that key.
+
+This example is a logging system, where the logs' producer send logs to an exchange with different severities. 
+Subscribers/consumers can listen for logs with multiple severities binding their freshly-created and exclusive 
+queues with one or more keys. While consuming their queues, they will receive the subset of messages they 
+subscribed for.
+
 # 5. Topics Routing
+
+There is another type of exchange named 'topic'. With these type of exchange we can bind a queue with multiple
+criteria. Messages sent to a topic exchange can't have an arbitrary routing key - it must be a list of words,
+delimited by dots (e.g. "quick.orange.rabbit"). The matching rules are similar to those of the 'direct' exchange
+with some differences: a star (*) can substitute for exactly one word, a hash (#) can substitute for multiple words.
+
+![05 diagram](./assets/05.png)
+
+This simple program is a more advanced logging system where the both severities and the source form the routing key.
+In the form _<facility>.<severity>_. In the consumer both members can be a * or a #, to represent the two forms of
+wildcards. Based on the routing key used on the producer side, bound queues should or should not receive some 
+messages. E.g.:
+
+- nginx.*       will receive all messages from the nginx facility
+- *.error       will receive only error logs from all facilities
+- cron.info	    will receive only info logs from the cron facility
+
 
 # 6. Remote Procedure Calls
 
+![06 diagram](./assets/06.png)
+
 # 7. Publish Confirmations
+
+![07 diagram](./assets/07.png)

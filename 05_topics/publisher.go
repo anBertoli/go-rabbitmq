@@ -67,6 +67,8 @@ func publisher() {
 	wait.Wait()
 }
 
+// Send logs of different severities and emulating a specific
+// source (provided via the second argument).
 func generateLogs(channel *amqp.Channel, facility string) {
 	for i := 0; ; i++ {
 		routingKey := fmt.Sprintf("%s.%s", facility, randSev())
@@ -79,12 +81,8 @@ func generateLogs(channel *amqp.Channel, facility string) {
 		if err != nil {
 			log.Fatalf("%s", err)
 		}
-
 		log.Printf("#%d - %s", i, routingKey)
-		waitRand(10)
-	}
-}
 
-func waitRand(n int) {
-	time.Sleep(time.Duration(rand.Intn(n)) * time.Second)
+		time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+	}
 }
