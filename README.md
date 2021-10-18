@@ -127,7 +127,7 @@ subscribed for.
 There is another type of exchange named 'topic'. With these type of exchange we can bind a queue with multiple
 criteria. Messages sent to a topic exchange can't have an arbitrary routing key - it must be a list of words,
 delimited by dots (e.g. "quick.orange.rabbit"). The matching rules are similar to those of the 'direct' exchange
-with some differences: a star (*) can substitute for exactly one word, a hash (#) can substitute for multiple 
+with some differences: a star (\*) can substitute for exactly one word, a hash (#) can substitute for multiple 
 words. When special characters "*" (star) and "#" (hash) aren't used in bindings, the topic exchange will behave 
 just like a direct one.
 
