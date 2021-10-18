@@ -122,6 +122,18 @@ Subscribers/consumers can listen for logs with multiple severities binding their
 queues with one or more keys. While consuming their queues, they will receive the subset of messages they 
 subscribed for.
 
+To start the example:
+```shell
+# start the logs producer
+go run ./04_routing --mode publisher
+
+# to start a subscriber for warn and error logs 
+go run ./04_routing --mode subscriber --sevs warn-error
+
+# to start a subscriber for info logs
+go run ./04_routing --mode subscriber --sevs info
+```
+
 # 5. Topics Routing
 
 There is another type of exchange named 'topic'. With these type of exchange we can bind a queue with multiple
@@ -142,10 +154,46 @@ messages. E.g.:
 - *.error       will receive only error logs from all facilities
 - cron.info	    will receive only info logs from the cron facility
 
+To start the example:
+```shell
+# start the logs producer
+go run ./05_topics --mode publisher
+
+# to start a subscriber that listens for errors from all sources 
+go run ./05_topics --mode subscriber --bind *.error
+
+# to start a subscriber for info logs from nginx
+go run ./05_topics --mode subscriber --bind nginx.info
+```
 
 # 6. Remote Procedure Calls
 
+This example is a simple setup of a pattern called Remote Procedure Call (RPC). With this pattern we want to run
+a function on a remote computer, collecting the response on the client side. The system is composed by a client 
+and one or more RPC servers. In the example a client sends a request message to a shared work queue (the RPC requests
+queue), the servers reads the task message, performs the job, and replies with a RPC response message in a 
+consumer-exclusive callback queue.
+
 ![06 diagram](./assets/06.png)
+
+In order to receive the response in a specific queue we need to send the callback queue address with the request. 
+Callback queues are exclusive and generated upon the client connection. RPC responses are auto-acked from the queue 
+while RPC requests must be acknowledged by the server when it finishes working on that task. There is another field, 
+the correlation-id used to correlate the response with its related RPC request. The reply-to field is used instead 
+to inform the RPC server about where to send the response.
+
+Note that we send one RPC request per time and we wait for the response sequentially. It's probably better to send
+RPC requests in batch, recording all correlation IDs and check this list while receiving responses (not done here, 
+since we are interested in the architecture not in performance).
+
+To start the example:
+```shell
+# start the RPC server (actually, three servers are started)
+go run ./06_rpc --mode server
+
+# start one or more clients in different shells
+go run ./06_rpc --mode client
+```
 
 # 7. Publish Confirmations
 

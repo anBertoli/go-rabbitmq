@@ -17,14 +17,14 @@ func startServers() {
 		rpcServers.Add(1)
 		go func(id int) {
 			defer rpcServers.Done()
-			server(id)
+			rpcServer(id)
 		}(i)
 	}
 
 	rpcServers.Wait()
 }
 
-func server(id int) {
+func rpcServer(id int) {
 
 	// We start by establishing the connection,
 	// the channel and declaring the queue.
