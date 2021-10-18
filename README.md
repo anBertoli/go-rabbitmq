@@ -197,4 +197,25 @@ go run ./06_rpc --mode client
 
 # 7. Publish Confirmations
 
+Publisher confirms are a RabbitMQ extension to implement reliable publishing. When publisher confirms are enabled on
+a channel, messages the client publishes are confirmed asynchronously by the broker, meaning they have been taken 
+care of on the server side. We can imagine publisher confirms as acknowledges that the server send to the producer.
+Publisher confirms are not enabled by default and must be enabled at the channel level. In the example two types
+of approaches are explored. 
+
+In the first one we send some messages and wait synchronously the broker confirmation. The confirmation is performed
+serially, that is, after each message we wait the confirmation (so we don't batch published messages). In the second 
+approach we send messages in batches and similarly we wait for confirmations in batches. After every n messages sent 
+we want to receive the broker confirmation for all of them. Waiting for a batch of messages to be confirmed improves
+throughput drastically over waiting for individual messages confirmations. A third approach could be used (not present
+in the repo at the moment). The second approach has a better throughput, but still, we block the entire process waiting
+for confirmations. Even worse, if one of the lasts messages in a batch are particularly slow, we are basically stopped
+waiting a single message, with a available resources on both the client and the server side to process more concurrent
+messages. So in the third approach we can asynchronously send messages and receive confirmations, with the process 
+being completely independent. If we accumulate too many un-acked messages we could slow the producer process, but in
+any case there isn't any drawback from slow confirmations from the other side of this concurrent system.
+
+
+
+
 ![07 diagram](./assets/07.png)
