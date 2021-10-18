@@ -214,8 +214,3 @@ waiting a single message, with a available resources on both the client and the 
 messages. So in the third approach we can asynchronously send messages and receive confirmations, with the process 
 being completely independent. If we accumulate too many un-acked messages we could slow the producer process, but in
 any case there isn't any drawback from slow confirmations from the other side of this concurrent system.
-
-
-
-
-![07 diagram](./assets/07.png)
