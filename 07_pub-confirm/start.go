@@ -24,7 +24,7 @@ func start() {
 	}
 	defer channel.Close()
 
-	queue, err := channel.QueueDeclare("test", false, false, false, false, nil)
+	queue, err := channel.QueueDeclare(confirmationQueue, false, false, false, false, nil)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}

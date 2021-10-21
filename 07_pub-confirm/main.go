@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	confirmationQueue = "confirmation-queue"
+	confirmationQueue = "pub-confirm"
 )
 
 func main() {

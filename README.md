@@ -13,6 +13,7 @@ meaning to receiving. A consumer is a program that mostly waits to receive messa
 consumer, and broker do not have to reside on the same host; indeed in most applications they don't. An 
 application can be both a producer and consumer, too.
 
+![01 diagram](./assets/01_new.png)
 ![01 diagram](./assets/01.png)
 
 The producer connects to the Rabbit broker (the server), declares (creates) a queue and send some messages to it.
@@ -35,6 +36,7 @@ having to wait for it to complete. Instead we schedule the task to be done later
 message and send it to a queue. A worker process running in the background will pop the tasks and eventually 
 execute the job. When you run many workers the tasks will be shared between them.
 
+![02 diagram](./assets/02_new.png)
 ![02 diagram](./assets/02.png)
 
 If a worker dies, we'd like the task to be delivered to another worker. In order to make sure a message is never
@@ -88,6 +90,7 @@ Basically, queues will be generated and destroyed dynamically when consumers con
 queues will be filled with flowing messages only).
 
 ![03 diagram](./assets/03.png)
+![03 diagram](./assets/03_new.png)
 
 To start the example:
 ```shell
@@ -109,6 +112,7 @@ To build this example we use a 'direct' exchange instead. The routing algorithm 
 a message goes to the queues whose binding key exactly matches the routing key of the message.
 
 ![04 diagram](./assets/04.png)
+![04 diagram](./assets/04_new.png)
 
 In the setup in figure, the direct exchange X has two queues bound to it. The first queue is bound with binding 
 key _orange_, and the second has two bindings, one with binding key _black_ and the other one with _green_. Here,
@@ -144,6 +148,7 @@ words. When special characters "*" (star) and "#" (hash) aren't used in bindings
 just like a direct one.
 
 ![05 diagram](./assets/05.png)
+![05 diagram](./assets/05_new.png)
 
 This simple program is a more advanced logging system where the both severities and the source form the routing key.
 In the form _<facility>.<severity>_. In the consumer both members can be a * or a #, to represent the two forms of
@@ -175,6 +180,7 @@ queue), the servers reads the task message, performs the job, and replies with a
 consumer-exclusive callback queue.
 
 ![06 diagram](./assets/06.png)
+![06 diagram](./assets/06_new.png)
 
 In order to receive the response in a specific queue we need to send the callback queue address with the request. 
 Callback queues are exclusive and generated upon the client connection. RPC responses are auto-acked from the queue 
@@ -202,6 +208,8 @@ a channel, messages the client publishes are confirmed asynchronously by the bro
 care of on the server side. We can imagine publisher confirms as acknowledges that the server send to the producer.
 Publisher confirms are not enabled by default and must be enabled at the channel level. In the example two types
 of approaches are explored. 
+
+![07 diagram](./assets/07_new.png)
 
 In the first one we send some messages and wait synchronously the broker confirmation. The confirmation is performed
 serially, that is, after each message we wait the confirmation (so we don't batch published messages). In the second 
