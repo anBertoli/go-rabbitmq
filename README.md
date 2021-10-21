@@ -14,7 +14,6 @@ consumer, and broker do not have to reside on the same host; indeed in most appl
 application can be both a producer and consumer, too.
 
 ![01 diagram](./assets/01_new.png)
-![01 diagram](./assets/01.png)
 
 The producer connects to the Rabbit broker (the server), declares (creates) a queue and send some messages to it.
 The receiver similarly connects to the broker, declares the queue (it's an idempotent operation) and starts 
@@ -37,7 +36,6 @@ message and send it to a queue. A worker process running in the background will 
 execute the job. When you run many workers the tasks will be shared between them.
 
 ![02 diagram](./assets/02_new.png)
-![02 diagram](./assets/02.png)
 
 If a worker dies, we'd like the task to be delivered to another worker. In order to make sure a message is never
 lost, Rabbit supports message acknowledgments. An ack(nowledgement) is sent back by the consumer to tell Rabbit
@@ -89,7 +87,6 @@ the queue will be dropped.
 Basically, queues will be generated and destroyed dynamically when consumers connect and disconnect (and those
 queues will be filled with flowing messages only).
 
-![03 diagram](./assets/03.png)
 ![03 diagram](./assets/03_new.png)
 
 To start the example:
@@ -111,7 +108,6 @@ similar to the previous program, but we use different routing/binding keys in bo
 To build this example we use a 'direct' exchange instead. The routing algorithm behind a direct exchange is simple - 
 a message goes to the queues whose binding key exactly matches the routing key of the message.
 
-![04 diagram](./assets/04.png)
 ![04 diagram](./assets/04_new.png)
 
 In the setup in figure, the direct exchange X has two queues bound to it. The first queue is bound with binding 
@@ -147,7 +143,6 @@ with some differences: a star (\*) can substitute for exactly one word, a hash (
 words. When special characters "*" (star) and "#" (hash) aren't used in bindings, the topic exchange will behave 
 just like a direct one.
 
-![05 diagram](./assets/05.png)
 ![05 diagram](./assets/05_new.png)
 
 This simple program is a more advanced logging system where the both severities and the source form the routing key.
@@ -179,7 +174,6 @@ and one or more RPC servers. In the example a client sends a request message to 
 queue), the servers reads the task message, performs the job, and replies with a RPC response message in a 
 consumer-exclusive callback queue.
 
-![06 diagram](./assets/06.png)
 ![06 diagram](./assets/06_new.png)
 
 In order to receive the response in a specific queue we need to send the callback queue address with the request. 
