@@ -188,7 +188,7 @@ This example is a simple implementation of a pattern called **_Remote Procedure 
 want to run a function on a remote computer, collecting the response on the client side. The system is composed by one
 or more _clients_ and one or more _RPC servers_. In the example clients send _RPC request_ messages to a shared work 
 queue (the RPC requests queue, named `rpc-queue`), while servers read those requests, perform the job, and reply with
-_RPC response_ messages in a **consumer exclusive callback queue**.
+_RPC response_ messages in a _consumer exclusive callback queue_.
 
 ![06 diagram](./assets/06_new.png)
 
