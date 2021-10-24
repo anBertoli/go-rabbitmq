@@ -73,71 +73,79 @@ go run ./02_workers-queue --mode worker
 
 # 3. Publish/Subscribe 
 
-In previous parts of the tutorial we sent and received messages to and from a queue. In the full messaging model 
-in Rabbit there are also exchanges. The core idea in the messaging model in RabbitMQ is that the producer never 
-sends any messages directly to a queue. Actually, quite often the producer doesn't even know if a message will 
-be delivered to any queue at all. Instead, the producer can only send messages to an exchange. Then, Rabbit sent
-those messages to one or more queues bound to that exchange.
+In previous examples we sent and received messages to and from a queue. In the full messaging model of Rabbit there
+are also **exchanges**. The core idea of the RabbitMQ messaging model is that the producer never sends any messages
+directly to a queue. Actually, quite often the producer doesn't even know if a message will be delivered to any
+queue at all. Instead, the producer can only send messages to an exchange. Then, Rabbit (which is a message broker 
+indeed) will send those messages to one or more queues _bound_ to that exchange.
 
-An exchange is a very simple thing. On one side it receives messages from producers and the other side it pushes
+An exchange is a very simple thing. On one side it receives messages from producers and on the other side it pushes
 them to queues. The exchange must know exactly what to do with a message it receives. The rules for exchanges are 
-defined by their type (direct, topic, headers and fanout).
-
-This example is a logging system, we want to send all logs produced to an exchange and then to all 'subscribers'. 
-To do this we will use an exchange of type 'fanout' which just broadcasts all the messages it receives to all 
-the queues it knows. When a consumer/subscriber joins we create a new empty queue with a random name, a queue that
-is specific for that subscriber. Then we bind the queue to the 'logs' exchange. Note that the subscriber is not 
-interested in messages sent before it is connected to the server. Secondly, when the subscriber disconnects, 
-the queue will be dropped.
-
-Basically, queues will be generated and destroyed dynamically when consumers connect and disconnect (and those
-queues will be filled with flowing messages only).
+defined by their type (**direct**, **topic**, **headers** and **fanout**).
 
 ![03 diagram](./assets/03_new.png)
 
+This example is a logging system that implements the publisher/subscriber design pattern. The _publisher_ will send
+all the produced logs to an exchange, then they will be routed to all _subscribers_ (the consumers). To do this we
+will use an exchange of type **_fanout_** which just broadcasts all the messages it receives to all the queues it knows.
+
+When a consumer/subscriber joins we create a new empty queue with a random name, a queue that is specific for that
+subscriber. Then we bind the queue to the `logs` exchange. Note that the subscriber is not interested in messages
+sent before it is connected to the server. Secondly, when the subscriber disconnects, the queue will be dropped.
+Basically, queues will be generated and destroyed dynamically when consumers connect and disconnect (and those
+queues will be filled with flowing messages only).
+
 To start the example:
 ```shell
-# start the jobs producer
+# Start the publisher.
 go run ./03_publish-subscribe --mode publisher
 
-# we can start as many subscribers as we want, 
-# similarly to a real subscription system
-
-# in one or more other shells 
+# We can start as many subscribers as we want, 
+# similarly to a real subscription system. Run
+# in one or more other shells: 
 go run ./03_publish-subscribe --mode subscriber
 ```
 
 # 4. Direct Routing
 
-In this tutorial we're going to make it possible to subscribe only to a subset of the messages. The structure is
-similar to the previous program, but we use different routing/binding keys in both queue bindings and message sending. 
-To build this example we use a 'direct' exchange instead. The routing algorithm behind a direct exchange is simple - 
+In this example we're build a logging system as before, but we are going to make it possible to subscribe only to a 
+subset of messages sent by a publisher. The structure is similar to the previous example, but we'll use different 
+**routing/binding keys** in both queue bindings and message sending. 
+
+Routing keys are strings used by producers to control where messages must be sent, specifically those messages are 
+sent to the queues that are bound to the exchange with a compatible binding key (binding key is like the routing
+key, but for consumers). Different types of exchanges have different types of matching criteria. The _fanout_ 
+exchange used in the previous example just send all messages to all bound queues, regardless of the keys used. To
+build this example we use a **_direct_** exchange instead. The routing algorithm behind a direct exchange is simple: 
 a message goes to the queues whose binding key exactly matches the routing key of the message.
 
 ![04 diagram](./assets/04_new.png)
 
-In the setup in figure, the direct exchange X has two queues bound to it. The first queue is bound with binding 
-key _orange_, and the second has two bindings, one with binding key _black_ and the other one with _green_. Here,
-a message published to the exchange with a routing key orange will be routed to the first queue. Messages with a 
-routing key of black or green will go to second queue. All other messages will be discarded. It is perfectly legal 
-to bind multiple queues with the same binding key. In this case a message with that routing key is sent to all 
-queues bound with that key.
+In the figure above, the direct exchange has three queues bound to it. The first queue is bound with the binding 
+key `info`, the second queue is bound with the binding key `warn` and the third queue has two bindings, one with
+the binding key `warn` and the other one with `error`. Here, a message published to the exchange with a routing key 
+info will be routed to the first queue. Messages with a routing key of _warn_ will go to second and third queues.
+Messages with a routing key of _error_ will go to the third queue only. All other messages will be discarded. It 
+is perfectly legal to bind multiple queues with the same binding key. 
 
-This example is a logging system, where the logs' producer send logs to an exchange with different severities. 
-Subscribers/consumers can listen for logs with multiple severities binding their freshly-created and exclusive 
-queues with one or more keys. While consuming their queues, they will receive the subset of messages they 
-subscribed for.
+In the example the producer send logs to an exchange with different severities (that are the routing keys of the 
+system). Subscribers/consumers can listen for logs with one or more severities, binding their freshly-created and
+exclusive queues with the related keys. While consuming their queues, consumers will receive only the subset of 
+messages they subscribed for.
 
 To start the example:
 ```shell
-# start the logs producer
-go run ./04_routing --mode publisher
+# Start the logs producer (the publisher).
+go run ./04_direct-routing --mode publisher
 
-# to start a subscriber for warn and error logs 
-go run ./04_routing --mode subscriber --sevs warn-error
+# Start a subscriber for info logs, in a new shell.
+go run ./04_direct-routing --mode subscriber --sevs info
 
-# to start a subscriber for info logs
-go run ./04_routing --mode subscriber --sevs info
+# Start a subscriber for warn logs, in a new shell.
+go run ./04_direct-routing --mode subscriber --sevs warn
+
+# Start a subscriber for warn and error logs, in a new shell. 
+go run ./04_direct-routing --mode subscriber --sevs warn-error
 ```
 
 # 5. Topics Routing
